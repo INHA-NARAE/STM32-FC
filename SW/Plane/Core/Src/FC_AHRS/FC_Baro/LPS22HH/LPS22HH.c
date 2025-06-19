@@ -1,5 +1,8 @@
 /*
- * LPS22HH/LPS22HH.c
+ * LPS22HH/LPS22HH.c (Work In Progress!)
+ *
+ * 현재 43 line에서 코드가 무한 루프 발생함. Tagia issue 참고
+ * 해결될 때까지 LPS22HH 사용하지 말 것. 
  *
  *  Created on: June 7, 2025
  *      Author: leecurrent04
