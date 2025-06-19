@@ -1,5 +1,5 @@
 /*
- * BMI323.c
+ * BMI323.c (Work In Progress!)
  * FC_AHRS/FC_IMU/BMI323/BMI323.c
  *
  *  Created on: June 19, 2025
