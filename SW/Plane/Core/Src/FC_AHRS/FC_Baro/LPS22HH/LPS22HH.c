@@ -25,7 +25,7 @@ int LPS22HH_Initialization(void)
 	if(!LL_SPI_IsEnabled(SPI1)){
 		LL_SPI_Enable(SPI1);
 	}
-	LPS22HH_DESELECT();
+	CHIP_DESELECT();
 
 	// check device
 	for(int i=0; i<5; i++)
@@ -34,17 +34,12 @@ int LPS22HH_Initialization(void)
 		if(i>=5) return 1;
 	}
 
-	// BOOT Phase check
-	while((LPS22HH_Readbyte(INT_SOURCE)&0x80)!=0x00){
-		HAL_Delay(100);
-	}
-
 	// Software Reset LPS22HH
 	temp_reg = LPS22HH_Readbyte(CTRL_REG2);
 	temp_reg = temp_reg | 0x04;
-//	LPS22HH_Writebyte(CTRL_REG2, temp_reg);
-//	while((LPS22HH_Readbyte(CTRL_REG2)&0x04)!=0x00){
-//	}
+	LPS22HH_Writebyte(CTRL_REG2, temp_reg);
+	while((LPS22HH_Readbyte(CTRL_REG2)&0x04)!=0x00){
+	}
 
 	// Set Output Data Rate
 	//0x00: One Shot
@@ -94,11 +89,11 @@ int LPS22HH_GetData(void)
 	getPressure(&pressure);
 	getTemperature(&temp);
 
-	scaled_pressure.time_boot_ms = system_time.time_boot_ms;
-	scaled_pressure.press_abs = (float)(pressure/4096.f);
-	scaled_pressure.press_diff = scaled_pressure.press_abs - base_pressure;
-	scaled_pressure.temperature = (int16_t)(temp/100.f);
-	scaled_pressure.temperature_press_diff = 0;
+	msg.scaled_pressure.time_boot_ms = msg.system_time.time_boot_ms;
+	msg.scaled_pressure.press_abs = (float)(pressure/4096.f);
+	msg.scaled_pressure.press_diff = msg.scaled_pressure.press_abs - base_pressure;
+	msg.scaled_pressure.temperature = (int16_t)(temp/100.f);
+	msg.scaled_pressure.temperature_press_diff = 0;
 	return 0;
 }
 
@@ -128,12 +123,12 @@ void getTemperature(int16_t* temperature)
 
 
 /* Functions 3 ---------------------------------------------------------------*/
-inline static void LPS22HH_SELECT(void)
+inline static void CHIP_SELECT(void)
 {
 	LL_GPIO_ResetOutputPin(BARO_NSS_GPIO_Port, BARO_NSS_Pin);
 }
 
-inline static void LPS22HH_DESELECT(void)
+inline static void CHIP_DESELECT(void)
 {
 	LL_GPIO_SetOutputPin(BARO_NSS_GPIO_Port, BARO_NSS_Pin);
 }
@@ -142,10 +137,10 @@ uint8_t LPS22HH_Readbyte(uint8_t reg_addr)
 {
 	uint8_t val;
 
-	LPS22HH_SELECT();
+	CHIP_SELECT();
 	SPI1_SendByte(reg_addr | 0x80); //Register. MSB 1 is read instruction.
 	val = SPI1_SendByte(0x00); //Send DUMMY
-	LPS22HH_DESELECT();
+	CHIP_DESELECT();
 
 	return val;
 }
@@ -154,33 +149,33 @@ void LPS22HH_Readbytes(unsigned char reg_addr, unsigned char len, unsigned char*
 {
 	unsigned int i = 0;
 
-	LPS22HH_SELECT();
+	CHIP_SELECT();
 	SPI1_SendByte(reg_addr | 0x80); //Register. MSB 1 is read instruction.
 	while(i < len)
 	{
 		data[i++] = SPI1_SendByte(0x00); //Send DUMMY
 	}
-	LPS22HH_DESELECT();
+	CHIP_DESELECT();
 }
 
 void LPS22HH_Writebyte(uint8_t reg_addr, uint8_t val)
 {
-	LPS22HH_SELECT();
+	CHIP_SELECT();
 	SPI1_SendByte(reg_addr & 0x7F); //Register. MSB 0 is write instruction.
 	SPI1_SendByte(val); //Data
-	LPS22HH_DESELECT();
+	CHIP_DESELECT();
 }
 
 void LPS22HH_Writebytes(unsigned char reg_addr, unsigned char len, unsigned char* data)
 {
 	unsigned int i = 0;
-	LPS22HH_SELECT();
+	CHIP_SELECT();
 	SPI1_SendByte(reg_addr & 0x7F); //Register. MSB 0 is write instruction.
 	while(i < len)
 	{
 		SPI1_SendByte(data[i++]); //Data
 	}
-	LPS22HH_DESELECT();
+	CHIP_DESELECT();
 }
 
 

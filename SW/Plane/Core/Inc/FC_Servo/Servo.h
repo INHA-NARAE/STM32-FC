@@ -14,15 +14,11 @@
 #include <main.h>
 
 #include <FC_Param/Param.h>
-#include <GCS_MAVLink/GCS_Common.h>
+#include <GCS_MAVLink/GCS_MAVLink.h>
 
 #include <FC_Servo/driver.h>
 
 /* Variables -----------------------------------------------------------------*/
-extern SYSTEM_TIME system_time;
-extern SERVO_OUTPUT_RAW servo_output_raw;
-extern RC_CHANNELS RC_channels;
-
 extern const uint8_t SERVO_TIMER_MAP[];
 
 

@@ -25,7 +25,7 @@
 #include "usbd_cdc_if.h"
 
 #include <FC_Param/Param.h>
-#include <GCS_MAVLink/GCS_Common.h>
+#include <GCS_MAVLink/GCS_MAVLink.h>
 
 #include <FC_Basic/Buzzer/driver.h>
 

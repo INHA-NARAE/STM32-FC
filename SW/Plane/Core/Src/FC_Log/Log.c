@@ -9,8 +9,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include <FC_Log/Log.h>
-#include <GCS_MAVLink/GCS_Common.h>
-
+#include <GCS_MAVLink/GCS_MAVLink.h>
 
 /* Variables -----------------------------------------------------------------*/
 const uint8_t code = 0xFD;
@@ -22,16 +21,16 @@ int Log_Send()
 	static uint32_t previous_time = 0;
 
 	// 10Hz 단위로 전송
-	if(!(system_time.time_boot_ms - previous_time > 100)) return -1;
-	previous_time = system_time.time_boot_ms;
+	if(!(msg.system_time.time_boot_ms - previous_time > 100)) return -1;
+	previous_time = msg.system_time.time_boot_ms;
 
 	switch(logType)
 	{
-	case 26: LOG_TRANSMIT(scaled_imu); break;
-	case 27: LOG_TRANSMIT(raw_imu); break;
-	case 29: LOG_TRANSMIT(scaled_pressure); break;
-	case 36: LOG_TRANSMIT(servo_output_raw); break;
-	case 65: LOG_TRANSMIT(RC_channels); break;
+	case 26: LOG_TRANSMIT(msg.scaled_imu); break;
+	case 27: LOG_TRANSMIT(msg.raw_imu); break;
+	case 29: LOG_TRANSMIT(msg.scaled_pressure); break;
+	case 36: LOG_TRANSMIT(msg.servo_output_raw); break;
+	case 65: LOG_TRANSMIT(msg.RC_channels); break;
 	default: break;
 	}
 	return 0;

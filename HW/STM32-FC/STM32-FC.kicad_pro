@@ -829,7 +829,7 @@
       "model_mode": 4,
       "workbook_filename": ""
     },
-    "page_layout_descr_file": "NARAE_Sheet.kicad_wks",
+    "page_layout_descr_file": "kicad-embed://NARAE_Sheet.kicad_wks",
     "plot_directory": "",
     "space_save_all_events": true,
     "spice_adjust_passive_values": false,

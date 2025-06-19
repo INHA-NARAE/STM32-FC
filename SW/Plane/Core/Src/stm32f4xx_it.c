@@ -23,7 +23,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <FC_Param/Param.h>
-#include <GCS_MAVLink/GCS_Common.h>
+#include <GCS_MAVLink/GCS_MAVLink.h>
 
 #include <FC_Basic/RingBuffer.h>
 #include <FC_RC/RadioControl.h>
@@ -315,7 +315,7 @@ void TIM8_UP_TIM13_IRQHandler(void)
 	if(LL_TIM_IsActiveFlag_UPDATE(TIM13))
 	{
 		LL_TIM_ClearFlag_UPDATE(TIM13);
-		system_time.time_boot_ms++;
+		msg.system_time.time_boot_ms++;
 	}
 
   /* USER CODE END TIM8_UP_TIM13_IRQn 0 */
@@ -333,7 +333,7 @@ void TIM8_TRG_COM_TIM14_IRQHandler(void)
 	if(LL_TIM_IsActiveFlag_UPDATE(TIM14))
 	{
 		LL_TIM_ClearFlag_UPDATE(TIM14);
-		system_time.time_unix_usec++;
+		msg.system_time.time_unix_usec++;
 	}
 
   /* USER CODE END TIM8_TRG_COM_TIM14_IRQn 0 */

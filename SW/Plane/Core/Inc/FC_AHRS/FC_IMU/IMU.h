@@ -12,7 +12,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include <GCS_MAVLink/GCS_Common.h>
+#include <GCS_MAVLink/GCS_MAVLink.h>
 
 #include <FC_AHRS/FC_IMU/driver.h>
 

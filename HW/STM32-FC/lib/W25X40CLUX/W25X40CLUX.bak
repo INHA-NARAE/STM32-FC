@@ -22,7 +22,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "W25X40CLUX:USON_LUXIG_TR_HandSolder"
 			(at 0 0 0)
 			(effects
 				(font

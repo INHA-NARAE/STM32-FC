@@ -24,23 +24,20 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include <GCS_MAVLink/GCS_Common.h>
+#include <GCS_MAVLink/GCS_MAVLink.h>
 
 #include <FC_AHRS/FC_IMU/ICM42688P/driver.h>
 #include <FC_AHRS/FC_IMU/ICM42688P/register_map.h>
 
 
 /* Variables -----------------------------------------------------------------*/
-extern RAW_IMU raw_imu;
-extern SCALED_IMU scaled_imu;
-
 extern int32_t gyro_x_offset, gyro_y_offset, gyro_z_offset;
 
 
 /* Functions 1 ---------------------------------------------------------------*/
-void Get6AxisRawData(void);
-void ConvertGyroRaw2Dps(void);
-void ConvertAccRaw2G(void);
+void ICM42688_Get6AxisRawData(void);
+void ICM42688_ConvertGyroRaw2Dps(void);
+void ICM42688_ConvertAccRaw2G(void);
 //int ICM42688_DataReady(void);
 
 

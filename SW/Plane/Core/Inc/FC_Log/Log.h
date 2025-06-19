@@ -15,7 +15,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <GCS_MAVLink/GCS_Common.h>
+#include <GCS_MAVLink/GCS_MAVLink.h>
 
 
 /* Variables -----------------------------------------------------------------*/

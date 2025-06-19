@@ -40,9 +40,9 @@ int PPM_readData(uint16_t data)
 {
 	static uint16_t previous = 0;
     static uint8_t cnt = 0;
-	uint16_t rx = system_time.time_unix_usec - previous;
+	uint16_t rx = msg.system_time.time_unix_usec - previous;
 
-	previous = system_time.time_unix_usec;
+	previous = msg.system_time.time_unix_usec;
 
 	// 첫 수신
     if(rx>2500){
@@ -70,7 +70,6 @@ int PPM_readData(uint16_t data)
 int PPM_getControlData(void)
 {
 	PARAM_RC_CH* paramCh = (PARAM_RC_CH*)&param.rc.channel[0];
-	RC_CHANNELS* rc = &RC_channels;
 
 	if(IS_FL_RX == 0) return -1;
 	if(RC_isBufferInit() != 0) return -2;
@@ -81,22 +80,20 @@ int PPM_getControlData(void)
 	for(int i=0; i<PPM_MAX_CHANNEL; i++){
 		// Reverse 처리
 		uint16_t value = ((uint16_t*)RC_Buffer)[i];
+		uint16_t msgValue = msg.RC_channels.value[i];
+
 		if((param.rc.reversedMask>>i)&0x01)
 		{
-			rc->value[i] = map(value,
-					1000, 2000,
-					paramCh[i].MAX, paramCh[i].MIN) + paramCh[i].TRIM;
+			msgValue = map(value, 1000, 2000, paramCh[i].MAX, paramCh[i].MIN) + paramCh[i].TRIM;
 		}
 		else{
-			rc->value[i] = map(value,
-					1000, 2000,
-					paramCh[i].MIN, paramCh[i].MAX) + paramCh[i].TRIM;
+			msgValue = map(value, 1000, 2000, paramCh[i].MIN, paramCh[i].MAX) + paramCh[i].TRIM;
 		}
 
 		// Dead-zone 처리
-		if(rc->value[i]>(1500-paramCh[i].DZ) && rc->value[i]<(1500+paramCh[i].DZ)){
-			rc->value[i] = 1500;
-		}
+		msgValue = RC_applyDeadZoneChannelValue(msgValue, param.rc.channel[i].DZ);
+
+		msg.RC_channels.value[i] = msgValue;
 	}
 
 	return 0;

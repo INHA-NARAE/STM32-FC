@@ -252,7 +252,6 @@ int SRXL2_doHandshake(SRXL2_Handshake_Packet *tx_packet)
  */
 int SRXL2_parseControlData(SRXL2_Control_Packet *rx)
 {
-	RC_CHANNELS* rc = &RC_channels;
 	PARAM_RC_CH* paramCh = (PARAM_RC_CH*)&param.rc.channel[0];
 
 	uint8_t channelCnt = 0;
@@ -266,6 +265,8 @@ int SRXL2_parseControlData(SRXL2_Control_Packet *rx)
 		if(i>=RC_CHANNEL_MAX) break;
 
 		uint16_t value = rx->data.values[channelCnt];
+		uint16_t msgValue = msg.RC_channels.value[i];
+
 		channelCnt++;
 
 		// RC 값 필터링 코드 작성
@@ -275,37 +276,38 @@ int SRXL2_parseControlData(SRXL2_Control_Packet *rx)
 		// Reverse 처리
 		if((param.rc.reversedMask>>i)&0x01)
 		{
-			rc->value[i] = map(value,
+			msgValue = map(value,
 					SRXL_CTRL_VALUE_MIN, SRXL_CTRL_VALUE_MAX,
 					paramCh[i].MAX, paramCh[i].MIN) + paramCh[i].TRIM;
 		}
 		else{
-			rc->value[i] = map(value,
+			msgValue = map(value,
 					SRXL_CTRL_VALUE_MIN, SRXL_CTRL_VALUE_MAX,
 					paramCh[i].MIN, paramCh[i].MAX) + paramCh[i].TRIM;
 		}
 
 		// Dead-zone 처리
-		if(rc->value[i]>(1500-paramCh[i].DZ) && rc->value[i]<(1500+paramCh[i].DZ)){
-			rc->value[i] = 1500;
-		}
+		msgValue = RC_applyDeadZoneChannelValue(msgValue, param.rc.channel[i].DZ);
+
+		msg.RC_channels.value[i] = msgValue;
 	}
 
-	if(system_time.time_boot_ms - previousTime > 2000){
-		previousTime = system_time.time_boot_ms;
+	// 2초마다 채널 마스크 정보 갱신
+	if(msg.system_time.time_boot_ms - previousTime > 2000){
+		previousTime = msg.system_time.time_boot_ms;
 		channelMask = 0;
 	}
 
 	channelMask |= rx->data.mask;
-	rc->chancount = countSetBits(channelMask);
-	rc->time_boot_ms = system_time.time_boot_ms;
+	msg.RC_channels.chancount = countSetBits(channelMask);
+	msg.RC_channels.time_boot_ms = msg.system_time.time_boot_ms;
 
 	/*
 	 * SRXL2에서 rssi가 양수면 %값, 음수면 dBm 값임.
 	 * MAVLink는 %값을 0-254 범위로 표현함
 	 */
 	if(!((rx->data.rssi>>8)&0x1)){
-		rc->rssi = map(rx->data.rssi, 0, 100, 0, 254);
+		msg.RC_channels.rssi = map(rx->data.rssi, 0, 100, 0, 254);
 	}
 
 	return 0;

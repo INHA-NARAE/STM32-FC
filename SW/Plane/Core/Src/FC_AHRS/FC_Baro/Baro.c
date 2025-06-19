@@ -9,7 +9,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include <FC_AHRS/FC_Baro/Baro.h>
-#include <GCS_MAVLink/GCS_Common.h>
+#include <GCS_MAVLink/GCS_MAVLink.h>
 
 
 /* Functions -----------------------------------------------------------------*/

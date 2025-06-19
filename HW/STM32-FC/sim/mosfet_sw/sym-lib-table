@@ -1,4 +1,0 @@
-(sym_lib_table
-  (version 7)
-  (lib (name "TPS62840YBG")(type "KiCad")(uri "C:/Users/Hyeonje/Documents/STM32-FC/HW/STM32-FC_v2/Custom_Parts/TPS62840YBG/TPS62840YBG.kicad_sym")(options "")(descr ""))
-)

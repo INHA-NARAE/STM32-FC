@@ -1,9 +1,0 @@
-EESchema-DOCLIB  Version 2.0
-#
-$CMP BMI323
-D 3.0 SHUTTLE BOARD DEV KIT BMI323
-K
-F https://www.bosch-sensortec.com/media/boschsensortec/downloads/datasheets/bst-bmi323-ds000.pdf
-$ENDCMP
-#
-#End Doc Library

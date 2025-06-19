@@ -1,5 +1,5 @@
 /*
- * FC_IMU/ICM42688P/ICM42688.c
+ * FC_AHRS/FC_IMU/ICM42688P/ICM42688.c
  *
  *  Created on: May 1, 2025
  *      Author: leecurrent04
@@ -71,10 +71,10 @@ int ICM42688_Initialization(void)
  */
 int ICM42688_GetData(void)
 {
-	Get6AxisRawData();
+	ICM42688_Get6AxisRawData();
 
-	ConvertGyroRaw2Dps();
-	ConvertAccRaw2G();
+	ICM42688_ConvertGyroRaw2Dps();
+	ICM42688_ConvertAccRaw2G();
 
 	return 0;
 }
@@ -85,20 +85,20 @@ int ICM42688_GetData(void)
  * @brief 6축 데이터를 레지스터 레벨에서 로딩
  * @retval None
  */
-void Get6AxisRawData()
+void ICM42688_Get6AxisRawData()
 {
 	uint8_t data[14];
 
 	ICM42688_Readbytes(TEMP_DATA1, 14, data);
 
-	raw_imu.time_usec = system_time.time_unix_usec;
-	raw_imu.temperature = (data[0] << 8) | data[1];
-	raw_imu.xacc = (data[2] << 8) | data[3];
-	raw_imu.yacc = (data[4] << 8) | data[5];
-	raw_imu.zacc = ((data[6] << 8) | data[7]);
-	raw_imu.xgyro = ((data[8] << 8) | data[9]);
-	raw_imu.ygyro = ((data[10] << 8) | data[11]);
-	raw_imu.zgyro = ((data[12] << 8) | data[13]);
+	msg.raw_imu.time_usec = msg.system_time.time_unix_usec;
+	msg.raw_imu.temperature = (data[0] << 8) | data[1];
+	msg.raw_imu.xacc = (data[2] << 8) | data[3];
+	msg.raw_imu.yacc = (data[4] << 8) | data[5];
+	msg.raw_imu.zacc = ((data[6] << 8) | data[7]);
+	msg.raw_imu.xgyro = ((data[8] << 8) | data[9]);
+	msg.raw_imu.ygyro = ((data[10] << 8) | data[11]);
+	msg.raw_imu.zgyro = ((data[12] << 8) | data[13]);
 
 	return;
 }
@@ -111,7 +111,7 @@ void Get6AxisRawData()
  * @parm none
  * @retval none
  */
-void ConvertGyroRaw2Dps(void)
+void ICM42688_ConvertGyroRaw2Dps(void)
 {
 	uint8_t gyro_reg_val = ICM42688_Readbyte(GYRO_CONFIG0);
 	uint8_t gyro_fs_sel = (gyro_reg_val >> 5) & 0x07;
@@ -131,12 +131,12 @@ void ConvertGyroRaw2Dps(void)
 	default: sensitivity = 16.4f; break;      // fallback: ±2000 dps
 	}
 
-	scaled_imu.time_boot_ms = system_time.time_boot_ms;
+	msg.scaled_imu.time_boot_ms = msg.system_time.time_boot_ms;
 
 	// m degree
-	scaled_imu.xgyro = (float)raw_imu.xgyro / sensitivity * 1000;
-	scaled_imu.ygyro = (float)raw_imu.ygyro / sensitivity * 1000;
-	scaled_imu.zgyro = (float)raw_imu.zgyro / sensitivity * 1000;
+	msg.scaled_imu.xgyro = (float)msg.raw_imu.xgyro / sensitivity * 1000;
+	msg.scaled_imu.ygyro = (float)msg.raw_imu.ygyro / sensitivity * 1000;
+	msg.scaled_imu.zgyro = (float)msg.raw_imu.zgyro / sensitivity * 1000;
 
 	return;
 }
@@ -149,7 +149,7 @@ void ConvertGyroRaw2Dps(void)
  * @parm none
  * @retval none
  */
-void ConvertAccRaw2G(void)
+void ICM42688_ConvertAccRaw2G(void)
 {
 	uint8_t acc_reg_val = ICM42688_Readbyte(ACCEL_CONFIG0);
 	uint8_t acc_fs_sel = (acc_reg_val >> 5) & 0x07;
@@ -166,9 +166,9 @@ void ConvertAccRaw2G(void)
 	}
 
 	// mG
-	scaled_imu.xacc = (float)raw_imu.xacc / sensitivity * 1000;
-	scaled_imu.yacc = (float)raw_imu.yacc / sensitivity * 1000;
-	scaled_imu.zacc = (float)raw_imu.zacc / sensitivity * 1000;
+	msg.scaled_imu.xacc = (float)msg.raw_imu.xacc / sensitivity * 1000;
+	msg.scaled_imu.yacc = (float)msg.raw_imu.yacc / sensitivity * 1000;
+	msg.scaled_imu.zacc = (float)msg.raw_imu.zacc / sensitivity * 1000;
 
 	return;
 }

@@ -6,7 +6,7 @@
 	(paper "A4")
 	(title_block
 		(title "Memory")
-		(date "2025-04-13")
+		(date "2025-06-19")
 		(rev "A")
 		(company "NARAE")
 		(comment 1 "INHA Univ. Areo-modelling Club")
@@ -3334,7 +3334,7 @@
 				)
 			)
 		)
-		(property "Footprint" "TF-06A:TF06A"
+		(property "Footprint" "TF06A"
 			(at 177.8 127.94 0)
 			(effects
 				(font

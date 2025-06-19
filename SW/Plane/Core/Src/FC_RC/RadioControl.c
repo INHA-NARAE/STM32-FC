@@ -52,9 +52,9 @@ int RC_Initialization(void)
 	}
 
 	// 쓰로틀 체크 & ESC 캘리브레이션
-	uint32_t previous_time = system_time.time_boot_ms;
+	uint32_t previous_time = msg.system_time.time_boot_ms;
 	while(1){
-		uint8_t flag_cali =  system_time.time_boot_ms - previous_time > 5000;
+		uint8_t flag_cali =  msg.system_time.time_boot_ms - previous_time > 5000;
 		uint8_t retVal = RC_checkThrottle();
 
 		// 쓰로틀이 low 인 경우나 신호가 없는 경우
@@ -130,7 +130,7 @@ int RC_checkThrottle(void)
 		if(num++ > 1000) return -2;
 	}
 
-	if(RC_channels.value[param.rc.map.THR]>1050) return -1;
+	if(msg.RC_channels.value[param.rc.map.THR]>1050) return -1;
 
 	return 0;
 }
@@ -215,7 +215,7 @@ int RC_enterESCcalibration()
 			if(num++ > 1000) return -2;
 		}
 
-		if(RC_channels.value[param.rc.map.THR] > 1800){
+		if(msg.RC_channels.value[param.rc.map.THR] > 1800){
 			SERVO_doCalibrate(1);
 			continue;
 		}
@@ -270,6 +270,7 @@ int RC_halfDuplex_Transmit(uint8_t *data, uint8_t len)
 }
 
 
+/* Functions 2 ---------------------------------------------------------------*/
 /*
  * @brief 입력 값의 범위를 바꾸는 mapping 함수
  * @parm uint16_t x : input
@@ -281,6 +282,19 @@ int RC_halfDuplex_Transmit(uint8_t *data, uint8_t len)
  */
 uint16_t map(uint16_t x, uint16_t in_min, uint16_t in_max, uint16_t out_min, uint16_t out_max) {
     return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+}
+
+uint16_t RC_normalizeChannelValue(){
+	return 0;
+}
+
+uint16_t RC_applyDeadZoneChannelValue(uint16_t value, uint8_t deadZone){
+
+	if(value > (1500-deadZone) && value < (1500+deadZone)){
+		return 1500;
+	}
+
+	return value;
 }
 
 

@@ -246,7 +246,7 @@ uint8_t configurePWM(uint16_t hz)
  */
 void calculateServoOutput(void)
 {
-	servo_output_raw.time_usec = system_time.time_boot_ms;
+	msg.servo_output_raw.time_usec = msg.system_time.time_boot_ms;
 
 	for(uint8_t i=0; i<SERVO_CHANNEL_MAX; i++)
 	{
@@ -255,7 +255,7 @@ void calculateServoOutput(void)
 			continue;
 		}
 
-		servo_output_raw.servo_raw[i] = RC_channels.value[i];
+		msg.servo_output_raw.servo_raw[i] = msg.RC_channels.value[i];
 		// servo_output_raw.servo_raw[i] = scaled_imu + RC_channels 를 기반으로 요리조리 계산해서 결정.
 	}
 
@@ -277,7 +277,7 @@ void setPWM(void)
 		if(!((param.servo.GPIO_MASK >> i)&0x1)){
 			continue;
 		}
-		setPWM2Channel(i+1, servo_output_raw.servo_raw[i]);
+		setPWM2Channel(i+1, msg.servo_output_raw.servo_raw[i]);
 	}
 	return;
 }

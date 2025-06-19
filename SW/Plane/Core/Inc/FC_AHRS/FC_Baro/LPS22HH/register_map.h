@@ -1,5 +1,6 @@
 /*
- * LPS22HH/register_map.h
+ * register_map.c
+ * FC_AHRS/FC_Baro/LPS22HH/register_map.h
  *
  *  Created on: June 7, 2025
  *      Author: leecurrent04
