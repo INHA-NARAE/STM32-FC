@@ -252,11 +252,8 @@ int SRXL2_doHandshake(SRXL2_Handshake_Packet *tx_packet)
  */
 int SRXL2_parseControlData(SRXL2_Control_Packet *rx)
 {
-	PARAM_RC_CH* paramCh = (PARAM_RC_CH*)&param.rc.channel[0];
-
 	uint8_t channelCnt = 0;
 	static uint32_t channelMask = 0;
-
 	static uint32_t previousTime = 0;
 
 	for(int i=0; i<SRXL_MAX_CHANNEL; i++)
@@ -265,32 +262,23 @@ int SRXL2_parseControlData(SRXL2_Control_Packet *rx)
 		if(i>=RC_CHANNEL_MAX) break;
 
 		uint16_t value = rx->data.values[channelCnt];
-		uint16_t msgValue = msg.RC_channels.value[i];
 
 		channelCnt++;
 
-		// RC 값 필터링 코드 작성
-		value = value<SRXL_CTRL_VALUE_MIN?SRXL_CTRL_VALUE_MIN:value;
-		value = value>SRXL_CTRL_VALUE_MAX?SRXL_CTRL_VALUE_MAX:value;
+		// Specktrum raw 값 정규화
+		value = RC_applyChannelNormMinMax(value, SRXL_CTRL_VALUE_MIN, SRXL_CTRL_VALUE_MAX);
 
-		// Reverse 처리
-		if((param.rc.reversedMask>>i)&0x01)
-		{
-			msgValue = map(value,
-					SRXL_CTRL_VALUE_MIN, SRXL_CTRL_VALUE_MAX,
-					paramCh[i].MAX, paramCh[i].MIN) + paramCh[i].TRIM;
-		}
-		else{
-			msgValue = map(value,
-					SRXL_CTRL_VALUE_MIN, SRXL_CTRL_VALUE_MAX,
-					paramCh[i].MIN, paramCh[i].MAX) + paramCh[i].TRIM;
-		}
+		// raw 범위에서 1000-2000 범위로 mapping
+		value = map(value, SRXL_CTRL_VALUE_MIN, SRXL_CTRL_VALUE_MAX, 1000, 2000);
 
-		// Dead-zone 처리
-		msgValue = RC_applyDeadZoneChannelValue(msgValue, param.rc.channel[i].DZ);
-
-		msg.RC_channels.value[i] = msgValue;
+		RC_MSG_setChannelValue(value, i);
 	}
+
+	/*
+	 * SRXL2에서 rssi가 양수면 %값, 음수면 dBm 값임.
+	 * MAVLink는 %값을 0-254 범위로 표현함
+	 */
+	uint8_t rssi = ((rx->data.rssi>>8)&0x1)?msg.RC_channels.rssi:map(rx->data.rssi, 0, 100, 0, 254);
 
 	// 2초마다 채널 마스크 정보 갱신
 	if(msg.system_time.time_boot_ms - previousTime > 2000){
@@ -299,16 +287,7 @@ int SRXL2_parseControlData(SRXL2_Control_Packet *rx)
 	}
 
 	channelMask |= rx->data.mask;
-	msg.RC_channels.chancount = countSetBits(channelMask);
-	msg.RC_channels.time_boot_ms = msg.system_time.time_boot_ms;
-
-	/*
-	 * SRXL2에서 rssi가 양수면 %값, 음수면 dBm 값임.
-	 * MAVLink는 %값을 0-254 범위로 표현함
-	 */
-	if(!((rx->data.rssi>>8)&0x1)){
-		msg.RC_channels.rssi = map(rx->data.rssi, 0, 100, 0, 254);
-	}
+	RC_MSG_setChannelInfo(countSetBits(channelMask), rssi);
 
 	return 0;
 }

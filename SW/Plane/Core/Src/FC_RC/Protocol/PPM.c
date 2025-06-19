@@ -69,8 +69,6 @@ int PPM_readData(uint16_t data)
  */
 int PPM_getControlData(void)
 {
-	PARAM_RC_CH* paramCh = (PARAM_RC_CH*)&param.rc.channel[0];
-
 	if(IS_FL_RX == 0) return -1;
 	if(RC_isBufferInit() != 0) return -2;
 
@@ -78,23 +76,11 @@ int PPM_getControlData(void)
 	CLEAR_FL_RX();
 
 	for(int i=0; i<PPM_MAX_CHANNEL; i++){
-		// Reverse 처리
 		uint16_t value = ((uint16_t*)RC_Buffer)[i];
-		uint16_t msgValue = msg.RC_channels.value[i];
-
-		if((param.rc.reversedMask>>i)&0x01)
-		{
-			msgValue = map(value, 1000, 2000, paramCh[i].MAX, paramCh[i].MIN) + paramCh[i].TRIM;
-		}
-		else{
-			msgValue = map(value, 1000, 2000, paramCh[i].MIN, paramCh[i].MAX) + paramCh[i].TRIM;
-		}
-
-		// Dead-zone 처리
-		msgValue = RC_applyDeadZoneChannelValue(msgValue, param.rc.channel[i].DZ);
-
-		msg.RC_channels.value[i] = msgValue;
+		RC_MSG_setChannelValue(value, i);
 	}
+
+	RC_MSG_setChannelInfo(8, 100);
 
 	return 0;
 }
