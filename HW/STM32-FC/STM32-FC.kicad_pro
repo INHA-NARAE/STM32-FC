@@ -240,6 +240,10 @@
           "drill": 0.0
         },
         {
+          "diameter": 0.4,
+          "drill": 0.3
+        },
+        {
           "diameter": 0.6,
           "drill": 0.4
         },
@@ -493,7 +497,7 @@
     "pinned_symbol_libs": []
   },
   "meta": {
-    "filename": "STM32-FC_v2.kicad_pro",
+    "filename": "STM32-FC.kicad_pro",
     "version": 3
   },
   "net_settings": {
